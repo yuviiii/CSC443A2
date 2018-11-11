@@ -1,11 +1,5 @@
 #include <vector>
-typedef const char* V;
-typedef std::vector<V> Record;
-typedef struct {
-	void *data;
-        int page_size;
-        int slot_size;
-   	} Page;
+
 
 /**
  * Compute the number of bytes required to serialize record
