@@ -53,7 +53,7 @@ void init_fixed_len_page(Page *page, int page_size, int slot_size){
 * Calculates the maximal number of records that fit in a page
 */
 int fixed_len_page_capacity(Page *page){
-	return page->page_size/page->page_slot;
+	return page->page_size/page->slot_size;
 }
 
 /**
