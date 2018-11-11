@@ -9,13 +9,13 @@ typedef const char* V;
 typedef std::vector<V> Record;
 typedef struct {
     void *data;
-        int page_size;
-        int slot_size;
-    } Page;
+    int page_size;
+    int slot_size;
+} Page;
 
 struct PageNode{
-  int offset;
-  PageNode *next;
+    int offset;
+    PageNode *next;
 }; 
 
 

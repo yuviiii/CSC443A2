@@ -60,7 +60,7 @@ int fixed_len_page_capacity(Page *page){
 * Calculate the free space (number of free slots) in the page
 */
 int fixed_len_page_freeslots(Page *page){
-	int my_capacity = page->page_size/page->page_slot;
+	int my_capacity = page->page_size/page->slot_size;
 	int free_num = 0;
 	for (int i = 0; i < my_capacity; i++){
 		if (page->data[i] == ""){
