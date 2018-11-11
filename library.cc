@@ -31,7 +31,7 @@ void fixed_len_read(void *buf, int size, Record *record){
 	for (int i = 0; i<record_size; i++){
 		char *my_buf ;
 		strncpy(my_buf, (char *)buf, 10);
-		record.push_back(my_buf);
+		record->push_back(my_buf);
 		buf = ((char*)buf) + 10;
 	}
 }
