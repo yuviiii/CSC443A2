@@ -41,13 +41,13 @@ int main(int argc, char **argv){
     	}
     	total_records += 1;
     }
-    printf("here\n");
-    int free_slot = fixed_len_page_freeslots(page);
-    int capacity = fixed_len_page_capacity(page);
-    if(free_slot != capacity){
-    	PageID newpid = alloc_page(heap_file);
-    	write_page(page,heap_file,newpid); 
-    }
+    // printf("here\n");
+    // int free_slot = fixed_len_page_freeslots(page);
+    // int capacity = fixed_len_page_capacity(page);
+    // if(free_slot != capacity){
+    // 	PageID newpid = alloc_page(heap_file);
+    // 	write_page(page,heap_file,newpid); 
+    // }
 
     ftime(&t);
 	now_in_ms2 = t.time*1000 + t.millitm;

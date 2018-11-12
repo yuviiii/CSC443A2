@@ -110,25 +110,40 @@ void read_fixed_len_page(Page *page, int slot, Record *r){
 /**
  * Initalize a heapfile to use the file and page size given.
  */
-void init_heapfile(Heapfile *heapfile, int page_size, FILE *file){
-	heapfile->file_ptr=file;
-	heapfile->page_size = page_size;
+void init_heapfile(Heapfile *heapfile, int page_size, FILE *file){	
     for (int i = 0; i <page_size/8; ++i) {
-        fwrite(&i, sizeof(int), 1, file);
+    	int offset = i;
+        fwrite(&offset, sizeof(int), 1, file);
         fwrite(&page_size, sizeof(int), 1, file);
+        printf("%d %d\n",i,page_size );
     }
-    fflush(file);
+    fseek(file,0,SEEK_SET);
+
+    for (int i = 0; i <page_size/8; ++i) {
+    	int offset_t,page_size_t;
+        fread(&offset_t, sizeof(int), 1, file);
+        // printf("%ld\n", ftell(heapfile->file_ptr));
+        fread(&page_size_t, sizeof(int), 1, file);
+        printf("%d %d\n",offset_t,page_size_t);
+    }
+    heapfile->file_ptr=file;
+	heapfile->page_size = page_size;
+    // fflush(file);
+
 }
 
 /**
  * Allocate another page in the heapfile.  This grows the file by a page.
  */
 PageID alloc_page(Heapfile *heapfile){
+	fseek(heapfile->file_ptr,0,SEEK_SET);
 	int page_offset,freespace,lastdirpageid = 0;
 	while(1){
 		fseek(heapfile->file_ptr,lastdirpageid*heapfile->page_size,SEEK_SET);
 		fread(&page_offset, sizeof(int), 1, heapfile->file_ptr);
+		// printf("%d  %d\n", page_offset,lastdirpageid);
 		if(page_offset==lastdirpageid) break;
+		// lastdirpageid = page_offset;
 	}
 
 	fseek(heapfile->file_ptr,lastdirpageid*heapfile->page_size,SEEK_SET);
