@@ -20,12 +20,8 @@ struct PageNode{
 
 
 typedef struct {
-    FILE *page_ptr;
+    FILE *file_ptr;
     int page_size;
-    PageNode *directoryLL;
-    PageNode *tail;
-    int offset;
-    int directorySlotSize;
 } Heapfile;
 
 typedef int PageID;
@@ -98,18 +94,12 @@ void read_page(Heapfile *heapfile, PageID pid, Page *page);
  * Write a page from memory to disk
  */
 void write_page(Page *page, Heapfile *heapfile, PageID pid);
-Page * getPageAt(Heapfile *heapfile, int offset);
-int  writePageAt(Heapfile *heapfile, Page * page, int offset);
-char* tostr (int x);
+
 class RecordIterator {
-        Heapfile *hf;
-        RecordID *rid;
-        Page *curPage;
-	
     public:
-	RecordIterator(Heapfile *heapfile);	
-    Record  next();
-    bool hasNext();
+        RecordIterator(Heapfile *heapfile);
+        Record next();
+        bool hasNext();
 };
 
 #endif

@@ -8,6 +8,7 @@
 int main(int argc, char **argv){
 	if (argc!=3){
 		printf("Usage:read_fixed_len_page <page_file> <page_size>\n");
+        exit(1);
 	}
 	int page_size = atoi(argv[2]);
 	FILE *page_file = fopen(argv[1], "rb");

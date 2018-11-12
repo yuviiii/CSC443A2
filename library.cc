@@ -107,3 +107,86 @@ void read_fixed_len_page(Page *page, int slot, Record *r){
     }
 }
 
+/**
+ * Initalize a heapfile to use the file and page size given.
+ */
+void init_heapfile(Heapfile *heapfile, int page_size, FILE *file){
+	heapfile->file_ptr=file;
+	heapfile->page_size = page_size;
+    for (int i = 0; i <page_size/8; ++i) {
+        fwrite(&i, sizeof(int), 1, file);
+        fwrite(&page_size, sizeof(int), 1, file);
+    }
+    fflush(file);
+}
+
+/**
+ * Allocate another page in the heapfile.  This grows the file by a page.
+ */
+PageID alloc_page(Heapfile *heapfile){
+	int page_offset,freespace,lastdirpageid = 0;
+	while(1){
+		fseek(heapfile->file_ptr,lastdirpageid*heapfile->page_size,SEEK_SET);
+		fread(&page_offset, sizeof(int), 1, heapfile->file_ptr);
+		if(page_offset==lastdirpageid) break;
+	}
+
+	fseek(heapfile->file_ptr,lastdirpageid*heapfile->page_size,SEEK_SET);
+    fread(&page_offset, sizeof(int), 1, heapfile->file_ptr);
+    fread(&freespace, sizeof(int), 1, heapfile->file_ptr);
+
+    for (int i = 1; i < heapfile->page_size/8; ++i) {
+        fread(&page_offset, sizeof(int), 1, heapfile->file_ptr);
+        fread(&freespace, sizeof(int), 1, heapfile->file_ptr);
+
+        if (freespace == heapfile->page_size) {
+            return page_offset;
+        }
+    }
+
+    int lastdatapage=page_offset;
+    fseek(heapfile->file_ptr,lastdirpageid*heapfile->page_size,SEEK_SET);
+    fwrite(&lastdatapage+1,sizeof(int),1,heapfile->file_ptr);
+
+    fseek(heapfile->file_ptr,(lastdatapage+1)*heapfile->page_size,SEEK_SET);
+    for (int i = 0; i <heapfile->page_size/8; ++i) {
+        fwrite(&i+lastdatapage+1, sizeof(int), 1, heapfile->file_ptr);
+        fwrite(&heapfile->page_size, sizeof(int), 1, heapfile->file_ptr);
+    }
+
+    return lastdatapage+2;
+}
+
+/**
+ * Read a page into memory
+ */
+void read_page(Heapfile *heapfile, PageID pid, Page *page){
+	init_fixed_len_page(page,heapfile->page_size,1000);
+	fseek(heapfile->file_ptr, pid*heapfile->page_size, SEEK_SET);
+	fread(page->data,heapfile->page_size,1,heapfile->file_ptr);
+}
+
+/**
+ * Write a page from memory to disk
+ */
+void write_page(Page *page, Heapfile *heapfile, PageID pid){
+	fseek(heapfile->file_ptr, pid * heapfile->page_size, SEEK_SET);
+	fwrite(page->data, heapfile->page_size, 1, heapfile->file_ptr);
+	int page_offset=0,freespace;
+	int pageleft = pid;
+	while(pageleft>(page->page_size/8-1)){
+		fseek(heapfile->file_ptr, page_offset*page->page_size, SEEK_SET);
+		fread(&page_offset,sizeof(int),1,heapfile->file_ptr);
+	}
+	fseek(heapfile->file_ptr, page_offset*page->page_size, SEEK_SET);
+	while(1){
+		fread(&page_offset,sizeof(int),1,heapfile->file_ptr);
+		if (page_offset==pid){
+			break;
+		}
+		fread(&freespace,sizeof(int),1,heapfile->file_ptr);
+	}
+	freespace = 1000*fixed_len_page_freeslots(page);
+	fwrite(&freespace, sizeof(int), 1, heapfile->file_ptr);
+	fflush(heapfile->file_ptr);
+}
