@@ -19,7 +19,7 @@ int fixed_len_sizeof(Record *record){
 void fixed_len_write(Record *record, void *buf){
 	for (int i = 0; i<record->size(); i++){
 		char *my_buf = (char*)buf + 10*i;
-		memcpy(my_buf, record->at(i), strlen(record->at(i))+1);
+		memcpy(my_buf, record->at(i), strlen(record->at(i)));
 	}
 }
 
@@ -45,8 +45,8 @@ void init_fixed_len_page(Page *page, int page_size, int slot_size){
 	page->page_size = page_size;
 	page->slot_size = slot_size;
 	page->data = (char*) malloc(page_size);
-    	for(int i = 0; i < my_capacity; i++){
-        	((char *)page->data)[i*slot_size] = '\0';
+    	for(int i = 0; i < page_size; i++){
+        	((char *)page->data)[i] = '\0';
 	}
 }
 
