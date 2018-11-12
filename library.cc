@@ -3,22 +3,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
+#include <strings.h>
 
 
 /**
  * Compute the number of bytes required to serialize record
  */
 int fixed_len_sizeof(Record *record){
-	return record.size()*10;
+	return record->size()*10;
 }
 
 /**
  * Serialize the record to a byte array to be stored in buf.
  */
 void fixed_len_write(Record *record, void *buf){
-	for (int i = 0; i<record.size(); i++){
+	for (int i = 0; i<record->size(); i++){
 		char *my_buf = (char*)buf + 10*i;
-		memcpy(my_buf, record[i], strlen(record[i]+1));
+		memcpy(my_buf, record->at(i), strlen(record->at(i))+1);
 	}
 }
 
@@ -29,7 +30,7 @@ void fixed_len_write(Record *record, void *buf){
 void fixed_len_read(void *buf, int size, Record *record){
 	int record_size = size/10;
 	for (int i = 0; i<record_size; i++){
-		char *my_buf ;
+		char *my_buf = (char *)malloc(11) ;
 		strncpy(my_buf, (char *)buf, 10);
 		record->push_back(my_buf);
 		buf = ((char*)buf) + 10;
@@ -45,7 +46,7 @@ void init_fixed_len_page(Page *page, int page_size, int slot_size){
 	page->slot_size = slot_size;
 	page->data = (char*) malloc(page_size);
     	for(int i = 0; i < my_capacity; i++){
-        	page->data[i] = "";
+        	((char *)page->data)[i*slot_size] = '\0';
 	}
 }
 
@@ -63,7 +64,7 @@ int fixed_len_page_freeslots(Page *page){
 	int my_capacity = page->page_size/page->slot_size;
 	int free_num = 0;
 	for (int i = 0; i < my_capacity; i++){
-		if (page->data[i] == ""){
+		if (((char *)page->data)[i*page->slot_size] == '\0'){
 			free_num += 1;
 		}	
 	}
@@ -80,15 +81,13 @@ int add_fixed_len_page(Page *page, Record *r){
 	int my_capacity = fixed_len_page_capacity(page);
 	if (fixed_len_page_freeslots(page) > 0){
 		for (int i = 0; i < my_capacity; i++){
-			if (page->data[i] == ""){
+			if (((char *)page->data)[i*page->slot_size] == '\0'){
 				write_fixed_len_page(page,i,r);
 				return i;
 			}
 		}
 	}
-	else{
-		return -1;
-	}
+	return -1;
 }
 /**
 * Write a record into a given slot.
@@ -102,7 +101,7 @@ void write_fixed_len_page(Page *page, int slot, Record *r){
 * Read a record from the page from a given slot.
 */
 void read_fixed_len_page(Page *page, int slot, Record *r){
-	if(page->data[slot] == ""){
+	if(((char *)page->data)[slot*page->page_size] == '\0'){
         char *buf = ((char * )page->data + (slot * (page->slot_size)));
         fixed_len_read(buf, (page->slot_size), r);
     }
