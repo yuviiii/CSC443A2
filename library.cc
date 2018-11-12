@@ -111,25 +111,14 @@ void read_fixed_len_page(Page *page, int slot, Record *r){
  * Initalize a heapfile to use the file and page size given.
  */
 void init_heapfile(Heapfile *heapfile, int page_size, FILE *file){	
-    for (int i = 0; i <page_size/8; ++i) {
+    for (int i = 0; i < page_size/8; ++i) {
     	int offset = i;
         fwrite(&offset, sizeof(int), 1, file);
         fwrite(&page_size, sizeof(int), 1, file);
-        printf("%d %d\n",i,page_size );
-    }
-    fseek(file,0,SEEK_SET);
-
-    for (int i = 0; i <page_size/8; ++i) {
-    	int offset_t,page_size_t;
-        fread(&offset_t, sizeof(int), 1, file);
-        // printf("%ld\n", ftell(heapfile->file_ptr));
-        fread(&page_size_t, sizeof(int), 1, file);
-        printf("%d %d\n",offset_t,page_size_t);
     }
     heapfile->file_ptr=file;
 	heapfile->page_size = page_size;
     // fflush(file);
-
 }
 
 /**
@@ -141,9 +130,8 @@ PageID alloc_page(Heapfile *heapfile){
 	while(1){
 		fseek(heapfile->file_ptr,lastdirpageid*heapfile->page_size,SEEK_SET);
 		fread(&page_offset, sizeof(int), 1, heapfile->file_ptr);
-		// printf("%d  %d\n", page_offset,lastdirpageid);
 		if(page_offset==lastdirpageid) break;
-		// lastdirpageid = page_offset;
+		lastdirpageid = page_offset;
 	}
 
 	fseek(heapfile->file_ptr,lastdirpageid*heapfile->page_size,SEEK_SET);
@@ -153,7 +141,6 @@ PageID alloc_page(Heapfile *heapfile){
     for (int i = 1; i < heapfile->page_size/8; ++i) {
         fread(&page_offset, sizeof(int), 1, heapfile->file_ptr);
         fread(&freespace, sizeof(int), 1, heapfile->file_ptr);
-
         if (freespace == heapfile->page_size) {
             return page_offset;
         }
@@ -192,6 +179,7 @@ void write_page(Page *page, Heapfile *heapfile, PageID pid){
 	while(pageleft>(page->page_size/8-1)){
 		fseek(heapfile->file_ptr, page_offset*page->page_size, SEEK_SET);
 		fread(&page_offset,sizeof(int),1,heapfile->file_ptr);
+		pageleft-=(page->page_size/8-1);
 	}
 	fseek(heapfile->file_ptr, page_offset*page->page_size, SEEK_SET);
 	while(1){
@@ -201,7 +189,9 @@ void write_page(Page *page, Heapfile *heapfile, PageID pid){
 		}
 		fread(&freespace,sizeof(int),1,heapfile->file_ptr);
 	}
+	
 	freespace = 1000*fixed_len_page_freeslots(page);
+	fseek(heapfile->file_ptr,0,SEEK_CUR);
 	fwrite(&freespace, sizeof(int), 1, heapfile->file_ptr);
-	fflush(heapfile->file_ptr);
+	// fflush(heapfile->file_ptr);
 }
