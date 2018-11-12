@@ -2,6 +2,7 @@
 #define LIBRARY_H
 
 #include <vector>
+#include <algorithm>
 #include <fstream>
 #include <stdlib.h>
 
