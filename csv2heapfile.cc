@@ -28,6 +28,7 @@ int main(int argc, char **argv){
 
     while (std::getline(ifs, line)){
     	Record record;
+    	// printf("%d\n", total_records);
     	line.erase(std::remove(line.begin(), line.end(), ','), line.end());
     	fixed_len_read((char*)line.c_str(), record_size, &record);
     	int slot_index = add_fixed_len_page(page, &record);

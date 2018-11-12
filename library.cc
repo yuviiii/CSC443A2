@@ -145,17 +145,18 @@ PageID alloc_page(Heapfile *heapfile){
             return page_offset;
         }
     }
-
+    fseek(heapfile->file_ptr,0,SEEK_CUR);
     int lastdatapage=page_offset;
     fseek(heapfile->file_ptr,lastdirpageid*heapfile->page_size,SEEK_SET);
-    fwrite(&lastdatapage+1,sizeof(int),1,heapfile->file_ptr);
+    int newdirpageid = lastdatapage+1;
+    fwrite(&newdirpageid,sizeof(int),1,heapfile->file_ptr);
 
     fseek(heapfile->file_ptr,(lastdatapage+1)*heapfile->page_size,SEEK_SET);
     for (int i = 0; i <heapfile->page_size/8; ++i) {
-        fwrite(&i+lastdatapage+1, sizeof(int), 1, heapfile->file_ptr);
+    	int offset = i+lastdatapage+1;
+        fwrite(&offset, sizeof(int), 1, heapfile->file_ptr);
         fwrite(&heapfile->page_size, sizeof(int), 1, heapfile->file_ptr);
     }
-
     return lastdatapage+2;
 }
 
