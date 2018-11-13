@@ -40,9 +40,10 @@ int main(int argc, char **argv){
     		read_fixed_len_page(page,i,&record);
     		// printf("%d\n", record.size());
     		if (record.size()>0 && record[0][0]!='0'){
-    			total_records++;
-                if (strncmp(record[aid],argv[3],10)>=0 and strncmp(record[aid],argv[4],10)<=0)
+                if (strncmp(record[aid],argv[3],10)>=0 and strncmp(record[aid],argv[4],10)<=0){
                     printf("%s\n", record[aid]);
+                    total_records++;
+                }
 	    	}
     	}
     	cur_page+=1;
@@ -53,7 +54,7 @@ int main(int argc, char **argv){
 	// now_in_ms2 = t.time*1000 + t.millitm;
 	// total_time += now_in_ms2 - now_in_ms1;
     fclose(open_heap_file);
-    // fprintf(stdout, "NUMBER OF RECORDS: %d\n", total_records);
+    fprintf(stdout, "NUMBER OF RECORDS: %d\n", total_records);
     // fprintf(stdout, "NUMBER OF DATA PAGES: %d\n", total_pages);
     // fprintf(stdout, "TIME: %ld milliseconds\n", total_time);
 }
