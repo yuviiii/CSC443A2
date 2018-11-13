@@ -32,6 +32,7 @@ void fixed_len_read(void *buf, int size, Record *record){
 	for (int i = 0; i<record_size; i++){
 		char *my_buf = (char *)malloc(11) ;
 		strncpy(my_buf, (char *)buf, 10);
+		my_buf[10]='\0';
 		// memset(my_buf, '\0', 11);
 		record->push_back(my_buf);
 		buf = ((char*)buf) + 10;
