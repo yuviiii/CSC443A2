@@ -13,7 +13,7 @@ int main(int argc, char **argv){
 		printf("Usage: ./delete <heapfile> <record_id> <page_size>\n");
 		exit(1);
 	}
-	int page_size = atoi(argv[3]),record_size = 1000,rid = atoi(argv[2]);
+	int page_size = atoi(argv[3]),record_size = 1000,rid = atoi(argv[2]),slotid,finalpid,freespace;
 	FILE *open_heap_file = fopen(argv[1], "rb+");
     Page *page = (Page *)malloc(sizeof(Page));
     page->data = (char *)malloc(page_size);
@@ -24,22 +24,62 @@ int main(int argc, char **argv){
     heap_file->page_size = page_size;
     heap_file->file_ptr = open_heap_file;
     int numberofentry = page_size/8-1,numofrecord = page_size/1000;
-    int slotid = (rid+1)%numofrecord-1;
-    if (slotid==-1) slotid = numofrecord-1;
-    int pid = (rid)/numofrecord;
-    int finalpid =pid + (pid)/numberofentry+1;
-
+    // int slotid = (rid+1)%numofrecord-1;
+    // if (slotid==-1) slotid = numofrecord-1;
+    // int pid = (rid)/numofrecord;
+    // int finalpid =pid + (pid)/numberofentry+1;
+    int curdir=0,nextdir,rleft = rid,notfind=1;
+    while(notfind){
+    	fread(&nextdir,sizeof(int),1,heap_file->file_ptr);
+    	fread(&freespace,sizeof(int),1,heap_file->file_ptr);
+    	int iter = 0;
+    	// printf("nextdir%d\n", nextdir);
+    	while(iter<numberofentry and notfind){
+    		iter+=1;
+    		// printf("%d\n", finalpid);
+    		fread(&finalpid,sizeof(int),1,heap_file->file_ptr);
+    		fread(&freespace,sizeof(int),1,heap_file->file_ptr);
+    		int recordnum = (page_size-freespace)/1000;
+    		if (rleft<recordnum){
+    			notfind = 0;
+    			fseek(heap_file->file_ptr,-4,SEEK_CUR);
+    			int newfree = freespace+1000;
+    			fwrite(&newfree,sizeof(int),1,heap_file->file_ptr);
+    		}
+    		else rleft-=recordnum;
+    		// printf("%d  %d\n", finalpid,rleft);
+    	}
+    	fseek(heap_file->file_ptr,nextdir*page_size,SEEK_SET);
+    }
     read_page(heap_file, finalpid, page);
-    Record record;
-    read_fixed_len_page(page,slotid,&record);
-	for (int j=0;j<record.size();j++){
-	    printf("%s", record[j]);
-	    memset((char *)record[j],'0',10);
-	    if (j==record.size()-1)printf("\n");
-	    else printf(",");
-	}
-	write_fixed_len_page(page,slotid,&record);
-	write_page(page,heap_file,finalpid);
+    // printf("%d. %d\n", finalpid,rleft);
+    
+    for (int i=0;i<fixed_len_page_capacity(page);i++){
+    	Record record;
+    	read_fixed_len_page(page,i,&record);
+    	if (record.size()>0 && record[0][0]!='0'){
+    		if(rleft==0){
+				for (int j=0;j<record.size();j++){
+				    printf("%s", record[j]);
+				    memset((char *)record[j],'0',10);
+				    if (j==record.size()-1)printf("\n");
+				    else printf(",");
+				}
+				write_fixed_len_page(page,i,&record);
+				write_page(page,heap_file,finalpid);
+				return 0;
+    		}else rleft-=1;
+	    }
+    }
+ //    read_fixed_len_page(page,slotid,&record);
+	// for (int j=0;j<record.size();j++){
+	//     printf("%s", record[j]);
+	//     memset((char *)record[j],'0',10);
+	//     if (j==record.size()-1)printf("\n");
+	//     else printf(",");
+	// }
+	// write_fixed_len_page(page,slotid,&record);
+	// write_page(page,heap_file,finalpid);
 
     return 0;
 }

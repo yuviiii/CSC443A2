@@ -182,11 +182,12 @@ void write_page(Page *page, Heapfile *heapfile, PageID pid){
 	while(pageleft>(page->page_size/8-1)){
 		fseek(heapfile->file_ptr, page_offset*page->page_size, SEEK_SET);
 		fread(&page_offset,sizeof(int),1,heapfile->file_ptr);
-		pageleft-=(page->page_size/8-1);
+		pageleft-=(page->page_size/8);
 	}
 	fseek(heapfile->file_ptr, page_offset*page->page_size, SEEK_SET);
 	while(1){
 		fread(&page_offset,sizeof(int),1,heapfile->file_ptr);
+		// printf("%d\n", page_offset);
 		if (page_offset==pid){
 			break;
 		}
