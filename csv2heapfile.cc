@@ -12,7 +12,7 @@ int main(int argc, char **argv){
 	}
 	int page_size = atoi(argv[3]);
 	FILE *open_heap_file = fopen(argv[2], "wb+");
-	int record_size = 1000,total_records = 0,total_pages = 0;;
+	int record_size = 1000,total_records = 0,total_pages = 0;
     Page *page = (Page *)malloc(sizeof(Page));
     page->data = (char *)malloc(page_size);
     init_fixed_len_page(page, page_size, record_size);

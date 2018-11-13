@@ -39,7 +39,7 @@ int main(int argc, char **argv){
     }
     int free_slot = fixed_len_page_freeslots(page);
     char *last_page = (char *)page->data;
-    if (strlen(last_page)>0){
+    if (fixed_len_page_capacity(page)-free_slot>0){
     	total_pages+=1;
     	for (int i=0;i<fixed_len_page_capacity(page)-free_slot;i++){
     		Record record;
