@@ -2,7 +2,7 @@
 CC = g++
 FLAGS = -std=c++11
 
-all: write_fixed_len_pages read_fixed_len_pages csv2heapfile scan insert
+all: write_fixed_len_pages read_fixed_len_pages csv2heapfile scan insert delete update
 
 library.o: library.cc library.h
 	$(CC) -o $@ -c $<
@@ -20,6 +20,12 @@ scan: scan.cc library.o
 	$(CC) $(FLAGS) -o $@ $< library.o
 
 insert: insert.cc library.o
+	$(CC) $(FLAGS) -o $@ $< library.o
+
+delete: delete.cc library.o
+	$(CC) $(FLAGS) -o $@ $< library.o
+
+update: update.cc library.o
 	$(CC) $(FLAGS) -o $@ $< library.o
 
 clean:
