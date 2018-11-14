@@ -38,10 +38,11 @@ int main(int argc, char **argv){
         while (std::getline(ifs, line)){
             numline+=1;
         	Record record;
+            record.clear();
         	line.erase(std::remove(line.begin(), line.end(), ','), line.end());
             strtowrite = strtowrite+line.substr(10*i,10);
             if (numline%100==0){
-                fixed_len_read((char*)strtowrite.c_str(), record_size, &record);
+                fixed_len_read((char*)strtowrite.c_str(), strtowrite.length(), &record);
                 int slot_index = add_fixed_len_page(page, &record);
                 if (slot_index==-1){
                     PageID newpid = alloc_page(heap_file);
@@ -51,11 +52,13 @@ int main(int argc, char **argv){
                     add_fixed_len_page(page, &record);
                 }
                 strtowrite="";
+                record.clear();
             }
         }
         if (numline%100!=0){
             Record record;
-            fixed_len_read((char*)strtowrite.c_str(), record_size, &record);
+            record.clear();
+            fixed_len_read((char*)strtowrite.c_str(), strtowrite.length(), &record);
             int slot_index = add_fixed_len_page(page, &record);
             if (slot_index==-1){
                 PageID newpid = alloc_page(heap_file);
@@ -64,6 +67,7 @@ int main(int argc, char **argv){
                 init_fixed_len_page(page, page_size, record_size);
                 add_fixed_len_page(page, &record);
             }
+            record.clear();
         }
         int free_slot = fixed_len_page_freeslots(page);
         int capacity = fixed_len_page_capacity(page);
