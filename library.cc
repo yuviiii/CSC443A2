@@ -28,6 +28,7 @@ void fixed_len_write(Record *record, void *buf){
 * stores the record in `record`.
 */
 void fixed_len_read(void *buf, int size, Record *record){
+	// printf("%s\n", (char *)buf);
 	int record_size = size/10;
 	for (int i = 0; i<record_size; i++){
 		char *my_buf = (char *)malloc(11) ;
