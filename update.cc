@@ -64,8 +64,9 @@ int main(int argc, char **argv){
                     else printf(",");
                 }
                 memset((char *)record[aid],'0',10);
+                // printf("%s\n", argv[4]);
                 strncpy((char *)record[aid],argv[4],10);
-                write_fixed_len_page(page,slotid,&record);
+                write_fixed_len_page(page,i,&record);
                 write_page(page,heap_file,finalpid);
                 return 0;
             }else rleft-=1;
