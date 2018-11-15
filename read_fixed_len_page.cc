@@ -34,7 +34,9 @@ int main(int argc, char **argv){
     			else printf(",");
     		}
     	}
+
     	init_fixed_len_page(page, page_size, record_size);
+        printf("here\n");
     	fread(page->data, 1, page->page_size, page_file);
     }
     int free_slot = fixed_len_page_freeslots(page);

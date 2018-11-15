@@ -32,7 +32,7 @@ void fixed_len_read(void *buf, int size, Record *record){
 	int record_size = size/10;
 	for (int i = 0; i<record_size; i++){
 		char *my_buf = (char *)malloc(11) ;
-		strncpy(my_buf, (char *)buf, 10);
+		memcpy(my_buf, (char *)buf, 10);
 		my_buf[10]='\0';
 		// memset(my_buf, '\0', 11);
 		record->push_back(my_buf);
@@ -104,10 +104,10 @@ void write_fixed_len_page(Page *page, int slot, Record *r){
 * Read a record from the page from a given slot.
 */
 void read_fixed_len_page(Page *page, int slot, Record *r){
-	if(((char *)page->data)[slot*page->page_size] != '0'){
+	// if(((char *)page->data)[slot*page->page_size] != '0'){
         char *buf = ((char * )page->data + (slot * (page->slot_size)));
         fixed_len_read(buf, (page->slot_size), r);
-    }
+    // }
 }
 
 /**
