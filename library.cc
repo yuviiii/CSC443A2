@@ -47,7 +47,7 @@ void init_fixed_len_page(Page *page, int page_size, int slot_size){
 	int my_capacity = page_size/slot_size;
 	page->page_size = page_size;
 	page->slot_size = slot_size;
-	page->data = (char*) malloc(page_size);
+	// page->data = (char*) malloc(page_size);
     	for(int i = 0; i < page_size; i++){
         	((char *)page->data)[i] = '0';
 	}
