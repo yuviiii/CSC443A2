@@ -6,10 +6,18 @@
 #include <sys/timeb.h>
 #include <stdlib.h>
 int main(int argc, char **argv){
-	if (argc!=3){
+	if (argc<3 || argc >4){
 		printf("Usage:read_fixed_len_page <page_file> <page_size>\n");
         exit(1);
 	}
+    bool stdoutFlag = true;
+    if (argc == 4 && strcmp(argv[3], "no-stdout") == 0) {
+        stdoutFlag = false;
+    }
+    if (argc == 4 && !(strcmp(argv[3], "no-stdout") == 0) ){
+        printf("Usage:read_fixed_len_page <page_file> <page_size> 'no-stdout'\n");
+        exit(1);
+    }
 	int page_size = atoi(argv[2]);
 	FILE *page_file = fopen(argv[1], "rb");
 	int record_size = 1000,total_records = 0,total_pages = 0;;
@@ -29,14 +37,15 @@ int main(int argc, char **argv){
     		read_fixed_len_page(page,i,&record);
     		total_records++;
     		for (int j=0;j<record.size();j++){
-    			printf("%s", record[j]);
-    			if (j==record.size()-1)printf("\n");
-    			else printf(",");
+                if(stdoutFlag){
+        			printf("%s", record[j]);
+        			if (j==record.size()-1)printf("\n");
+        			else printf(",");
+                }
     		}
     	}
 
     	init_fixed_len_page(page, page_size, record_size);
-        printf("here\n");
     	fread(page->data, 1, page->page_size, page_file);
     }
     int free_slot = fixed_len_page_freeslots(page);
@@ -48,9 +57,11 @@ int main(int argc, char **argv){
     		total_records++;
     		read_fixed_len_page(page,i,&record);
     		for (int j=0;j<record.size();j++){
-    			printf("%s", record[j]);
-    			if (j==record.size()-1)printf("\n");
-    			else printf(",");
+                if(stdoutFlag){
+        			printf("%s", record[j]);
+        			if (j==record.size()-1)printf("\n");
+        			else printf(",");
+                }
     		}
     	}
     }

@@ -7,10 +7,18 @@
 #include <stdlib.h>
 
 int main(int argc, char **argv){
-	if (argc!=7){
-		printf("Usage: ./select <colstore_name> <attribute_id> <return_aid> <start> <end> <page_size>\n");
+	if (argc<7 || argc>8){
+		printf("Usage: ./select3 <colstore_name> <attribute_id> <return_aid> <start> <end> <page_size>\n");
 		exit(1);
 	}
+    bool stdoutFlag = true;
+    if (argc == 8 && strcmp(argv[7], "no-stdout") == 0) {
+        stdoutFlag = false;
+    }
+    if(argc == 8 && !(strcmp(argv[7], "no-stdout") == 0) ){
+        printf("Usage: ./select3 <colstore_name> <attribute_id> <return_aid> <start> <end> <page_size> 'no-stdout'\n");
+        exit(1);
+    }
     char path[100],path1[100];
     strcpy(path,argv[1]);
     strcat(path,"/column");
@@ -42,7 +50,7 @@ int main(int argc, char **argv){
     ftime(&t);
     now_in_ms1 = t.time*1000 + t.millitm;
     while(cur_page!=(last_dir_page+numberofentry)){
-        // printf("here\n");
+
     	if (cur_page%(numberofentry+1)==0){
     		fseek(heap_file->file_ptr, cur_page*page_size, SEEK_SET);
     		fread(&last_dir_page,sizeof(int),1,heap_file->file_ptr);
@@ -58,11 +66,13 @@ int main(int argc, char **argv){
     		Record record,record1;
     		read_fixed_len_page(page,i,&record);
             read_fixed_len_page(page1,i,&record1);
-    		// printf("%d\n", record.size());
     		if (record.size()>0 && record[0][0]!='0'){
                 for (int k=0;k<record.size();k++){
                     if (strncmp(record[k],argv[4],10)>=0 and strncmp(record[k],argv[5],10)<=0){
+                        if(stdoutFlag){
                         printf("%s\n", record1[k]);
+                        }
+                        
                         total_records++;
                     }
                 }
@@ -73,11 +83,12 @@ int main(int argc, char **argv){
         init_fixed_len_page(page1, page_size, record_size);
     }
 
- //    ftime(&t);
-	// now_in_ms2 = t.time*1000 + t.millitm;
-	// total_time += now_in_ms2 - now_in_ms1;
+    ftime(&t);
+	now_in_ms2 = t.time*1000 + t.millitm;
+	total_time += now_in_ms2 - now_in_ms1;
     fclose(open_heap_file);
     fprintf(stdout, "NUMBER OF RECORDS: %d\n", total_records);
-    // fprintf(stdout, "NUMBER OF DATA PAGES: %d\n", total_pages);
-    // fprintf(stdout, "TIME: %ld milliseconds\n", total_time);
+    fprintf(stdout, "NUMBER OF DATA PAGES: %d\n", total_pages);
+    fprintf(stdout, "TIME: %ld milliseconds\n", total_time);
+    return 0;
 }

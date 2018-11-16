@@ -7,10 +7,18 @@
 #include <stdlib.h>
 
 int main(int argc, char **argv){
-	if (argc!=6){
-		printf("Usage: ./select <colstore_name> <attribute_id> <start> <end> <page_size>\n");
+	if (argc<6 || argc>7){
+		printf("Usage: ./select2 <colstore_name> <attribute_id> <start> <end> <page_size>\n");
 		exit(1);
 	}
+    bool stdoutFlag = true;
+    if (argc == 7 && strcmp(argv[6], "no-stdout") == 0) {
+        stdoutFlag = false;
+    }
+    if(argc == 7 && !(strcmp(argv[6], "no-stdout") == 0) ){
+        printf("Usage: ./select2 <colstore_name> <attribute_id> <start> <end> <page_size> 'no-stdout'\n");
+        exit(1);
+    }
     char path[100];
     strcpy(path,argv[1]);
     strcat(path,"/column");
@@ -46,7 +54,9 @@ int main(int argc, char **argv){
     		if (record.size()>0 && record[0][0]!='0'){
                 for (int k=0;k<record.size();k++){
                     if (strncmp(record[k],argv[3],10)>=0 and strncmp(record[k],argv[4],10)<=0){
+                        if(stdoutFlag){
                         printf("%s\n", record[k]);
+                        }
                         total_records++;
                     }
                 }
@@ -56,11 +66,12 @@ int main(int argc, char **argv){
     	init_fixed_len_page(page, page_size, record_size);
     }
 
- //    ftime(&t);
-	// now_in_ms2 = t.time*1000 + t.millitm;
-	// total_time += now_in_ms2 - now_in_ms1;
+    ftime(&t);
+	now_in_ms2 = t.time*1000 + t.millitm;
+	total_time += now_in_ms2 - now_in_ms1;
     fclose(open_heap_file);
     fprintf(stdout, "NUMBER OF RECORDS: %d\n", total_records);
-    // fprintf(stdout, "NUMBER OF DATA PAGES: %d\n", total_pages);
-    // fprintf(stdout, "TIME: %ld milliseconds\n", total_time);
+    fprintf(stdout, "NUMBER OF DATA PAGES: %d\n", total_pages);
+    fprintf(stdout, "TIME: %ld milliseconds\n", total_time);
+    return 0;
 }
