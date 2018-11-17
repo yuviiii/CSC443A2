@@ -28,29 +28,39 @@ int main(int argc, char **argv){
 
     ftime(&t);
     now_in_ms1 = t.time*1000 + t.millitm;
-    while(cur_page!=(last_dir_page+numberofentry)){
+    while(cur_page<=(last_dir_page+numberofentry)){
+        int entoff = cur_page;
     	if (cur_page%(numberofentry+1)==0){
     		fseek(heap_file->file_ptr, cur_page*page_size, SEEK_SET);
+            entoff = cur_page*page_size+8;
     		fread(&last_dir_page,sizeof(int),1,heap_file->file_ptr);
     		cur_page+=1;
     	}
-    	read_page(heap_file,cur_page,page);
-    	int free_slot = fixed_len_page_freeslots(page);
-    	if (free_slot!=fixed_len_page_capacity(page)) total_pages+=1;
-    	for (int i = 0; i<fixed_len_page_capacity(page);i++){
-    		Record record;
-    		read_fixed_len_page(page,i,&record);
-    		// printf("%d\n", record.size());
-    		if (record.size()>0 && record[0][0]!='0'){
-    			total_records++;
-	    		for (int j=0;j<record.size();j++){
-	    			printf("%s", record[j]);
-	    			if (j==record.size()-1)printf("\n");
-	    			else printf(",");
-	    		}
-	    	}
-    	}
-    	cur_page+=1;
+        int pageoff,freespace;
+        while(cur_page%(numberofentry+1)!=0){
+            fseek(heap_file->file_ptr,entoff,SEEK_SET);
+            fread(&pageoff,sizeof(int),1,heap_file->file_ptr);
+            fread(&freespace,sizeof(int),1,heap_file->file_ptr);
+            if (freespace<page_size){
+                read_page(heap_file,pageoff,page);
+                total_pages+=1;
+                for (int i = 0; i<fixed_len_page_capacity(page);i++){
+                    Record record;
+                    read_fixed_len_page(page,i,&record);
+                    // printf("%d\n", record.size());
+                    if (record.size()>0 && record[0][0]!='0'){
+                        total_records++;
+                        for (int j=0;j<record.size();j++){
+                            printf("%s", record[j]);
+                            if (j==record.size()-1)printf("\n");
+                            else printf(",");
+                        }
+                    }
+                }
+            }
+            cur_page+=1;
+            entoff+=8;
+        }
     	init_fixed_len_page(page, page_size, record_size);
     }
 
