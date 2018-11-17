@@ -47,6 +47,7 @@ int main(int argc, char **argv){
     	read_page(heap_file,cur_page,page);
     	int free_slot = fixed_len_page_freeslots(page);
     	if (free_slot!=fixed_len_page_capacity(page)) total_pages+=1;
+        else break;
     	for (int i = 0; i<fixed_len_page_capacity(page);i++){
     		Record record;
     		read_fixed_len_page(page,i,&record);
@@ -55,8 +56,8 @@ int main(int argc, char **argv){
                 for (int k=0;k<record.size();k++){
                     if (strncmp(record[k],argv[3],10)>=0 and strncmp(record[k],argv[4],10)<=0){
                         if(stdoutFlag){
-                            // std::string stoprint = record[k];
-                            // printf("%s\n", stoprint.substr(0,5).c_str()); 
+                            std::string stoprint = record[k];
+                            printf("%s\n", stoprint.substr(0,5).c_str()); 
                         }
                         total_records++;
                     }

@@ -62,6 +62,7 @@ int main(int argc, char **argv){
         read_page(heap_file1,cur_page,page1);
     	int free_slot = fixed_len_page_freeslots(page);
     	if (free_slot!=fixed_len_page_capacity(page)) total_pages+=1;
+        else break;
     	for (int i = 0; i<fixed_len_page_capacity(page);i++){
     		Record record,record1;
     		read_fixed_len_page(page,i,&record);
