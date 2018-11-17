@@ -29,9 +29,9 @@ def select2(colstore, attributeId, start, end, pageSize):
 
 def main():
     if len(sys.argv) != 5:
-        print('Usage: experiment_select2 <pageFile> <attributeId> <start> <end>')
+        print('Usage: experiment_select2 <csvFile> <attributeId> <start> <end>')
         sys.exit(1)
-    colstore = sys.argv[1]
+    csvFile = sys.argv[1]
     attributeId = sys.argv[2]
     start = sys.argv[3]
     end = sys.argv[4]
@@ -44,6 +44,11 @@ def main():
         16 * 2 ** 10,  
         32 * 2 ** 10,
         64 * 2 ** 10,
+        128 * 2 ** 10, 
+        256 * 2 ** 10,  # 256 KB
+        512 * 2 ** 10,  # 512 KB
+        1 * 2 ** 20,  # 1 MB
+        2 * 2 ** 20,  # 2 MB
     ]
     sizeList = []    
     timeTookList = []
@@ -55,11 +60,22 @@ def main():
     csvwriter = csv.DictWriter(sys.stdout, fieldnames=('page_size','time_took'))
     csvwriter.writeheader()
     for size in pageSizes:
+        colstore = 'col' + str(size)
+        # print(pageFile)
+        subprocess.run(
+        [
+            os.path.join(os.path.dirname(os.path.realpath(__file__)), './csv2colstore'),
+            csvFile,
+            colstore,
+            str(size),
+        ],
+        stdout=subprocess.PIPE,
+        )
         aveRate = 0
         timeAve = 0
         timeTookList[:] = []
         # numRecords = 0
-        for i in range(2):
+        for i in range(3):
             timeTook = select2(
                 colstore,
                 attributeId,
@@ -74,7 +90,7 @@ def main():
             
             timeTookList.append(int(timeTook))
         
-        timeAve = sum(timeTookList)/2
+        timeAve = sum(timeTookList)/3
         sizeList.append(int(size))
         timeAveList.append(timeAve)
 
@@ -83,10 +99,10 @@ def main():
     plt.xlabel("Page Size (Bytes)")
     plt.ylabel("Select Data Time Took (ms)")
     plt.xscale('log', basex=2)
-    plt.yscale('log', basey=2)
+    # plt.yscale('log', basey=2)
 
-    plt.ylim(0,5000)
-    plt.title('Select2 A-F ',fontweight='bold')
+    plt.ylim(0,max(timeAveList)+10)
+    plt.title('Select2 A-Z ',fontweight='bold')
     plt.show()
     
 if __name__ == '__main__':

@@ -23,7 +23,6 @@ def select(pageFile, attributeId, start, end, pageSize):
         ],
         stdout=subprocess.PIPE,
     )
-    print(bytes.decode(result.stdout))
     return bytes.decode(result.stdout).split('\n')[2].split(' ')[1]
 
 def main():
@@ -44,6 +43,10 @@ def main():
         32 * 2 ** 10,   # 32 KB
         64 * 2 ** 10,   # 64 KB
         128 * 2 ** 10,   # 64 KB
+        256 * 2 ** 10,  # 256 KB
+        512 * 2 ** 10,  # 512 KB
+        1 * 2 ** 20,  # 1 MB
+        2 * 2 ** 20,  # 2 MB
     ]
     sizeList = []    
     timeTookList = []
@@ -69,7 +72,7 @@ def main():
         timeAve = 0
         timeTookList[:] = []
         numRecords = 0
-        for i in range(2):
+        for i in range(3):
             timeTook = select(
                 pageFile,
                 attributeId,
@@ -84,7 +87,7 @@ def main():
             
             timeTookList.append(int(timeTook))
         
-        timeAve = sum(timeTookList)/2
+        timeAve = sum(timeTookList)/3
         sizeList.append(int(size))
         timeAveList.append(timeAve)
 
@@ -93,10 +96,10 @@ def main():
     plt.xlabel("Page Size (Bytes)")
     plt.ylabel("Select Data Time Took (ms)")
     plt.xscale('log', basex=2)
-    plt.yscale('log', basey=2)
+    # plt.yscale('log', basey=2)
 
-    plt.ylim(0,max(timeAveList)+1000)
-    plt.title('Select A-B ',fontweight='bold')
+    plt.ylim(40,150)
+    plt.title('Select A-F ',fontweight='bold')
     plt.show()
 
 if __name__ == '__main__':
