@@ -50,7 +50,8 @@ int main(int argc, char **argv){
     		if (record.size()>0 && record[0][0]!='0'){
                 if (strncmp(record[aid],argv[3],10)>=0 and strncmp(record[aid],argv[4],10)<=0){
                     if(stdoutFlag){
-                        printf("%s\n", record[aid]);       
+                        std::string stoprint = record[aid];
+                        printf("%s\n", stoprint.substr(0,5).c_str());       
                     }
                     total_records++;
                 }

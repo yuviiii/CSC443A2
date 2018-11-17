@@ -70,7 +70,8 @@ int main(int argc, char **argv){
                 for (int k=0;k<record.size();k++){
                     if (strncmp(record[k],argv[4],10)>=0 and strncmp(record[k],argv[5],10)<=0){
                         if(stdoutFlag){
-                        printf("%s\n", record1[k]);
+                            std::string stoprint = record1[k];
+                            printf("%s\n", stoprint.substr(0,5).c_str()); 
                         }
                         
                         total_records++;

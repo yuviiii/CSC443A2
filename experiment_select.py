@@ -84,7 +84,7 @@ def main():
     plt.xscale('log', basex=2)
     plt.yscale('log', basey=2)
 
-    plt.ylim(0,5000)
+    plt.ylim(0,max(timeAveList)+1000)
     plt.title('Select A-F ',fontweight='bold')
     plt.show()
 
