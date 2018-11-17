@@ -95,14 +95,14 @@ def main():
         aveRate = totalSize/timeAve
         sizeList.append(int(size))
         aveRateList.append(aveRate)
-        
+    print(aveRateList)
     plt.scatter(sizeList, aveRateList)
     plt.plot(sizeList, aveRateList)
     plt.xlabel("Page Size (Bytes)")
     plt.ylabel("Write Data Rates (records/s)")
     plt.xscale('log', basex=2)
 
-    plt.ylim(0, 20000)
+    plt.ylim(0, max(aveRateList)+5000)
     # plt.ylim(0, 8e6)  for usb write
     plt.title('Write ::: ',fontweight='bold')
     plt.show()

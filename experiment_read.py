@@ -20,6 +20,7 @@ def read_fixed_len_pages(pageFile, pageSize):
         ],
         stdout=subprocess.PIPE,
     )
+    # print(result.stdout)
     # print (bytes.decode(result.stdout).split('\n'))
     return bytes.decode(result.stdout).split('\n')[2].split(' ')[1]
 
@@ -93,7 +94,7 @@ def main():
     plt.ylabel("Read Data Rates (records/s)")
     plt.xscale('log', basex=2)
 
-    plt.ylim(0, 100000)
+    plt.ylim(0, max(aveRateList)+5000)
     # plt.ylim(0, 8e6)  for usb write
     plt.title('Read ::: ',fontweight='bold')
     plt.show()

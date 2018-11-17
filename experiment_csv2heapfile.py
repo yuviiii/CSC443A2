@@ -86,7 +86,7 @@ def main():
     plt.ylabel("csv2heapfile Data Rates (records/s)")
     plt.xscale('log', basex=2)
 
-    plt.ylim(0, 20000)
+    plt.ylim(0, max(aveRateList)+5000)
     plt.title('Build Heapfile from csv ::: ',fontweight='bold')
     plt.show()
 
