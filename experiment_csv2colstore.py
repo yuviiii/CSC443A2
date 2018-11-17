@@ -88,7 +88,7 @@ def main():
     plt.ylabel("csv2colstore Data Rates (records/s)")
     plt.xscale('log', basex=2)
 
-    plt.ylim(0, 500)
+    plt.ylim(0, max(aveRateList)+1000)
     # plt.ylim(0, 8e6)  for usb write
     plt.title('csv to Colstore ::: ',fontweight='bold')
     plt.show()
