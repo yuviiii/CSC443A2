@@ -23,26 +23,27 @@ def select(pageFile, attributeId, start, end, pageSize):
         ],
         stdout=subprocess.PIPE,
     )
-    # print(bytes.decode(result.stdout).split('\n'))
+    print(bytes.decode(result.stdout))
     return bytes.decode(result.stdout).split('\n')[2].split(' ')[1]
 
 def main():
     if len(sys.argv) != 5:
-        print('Usage: experiment_select <pageFile> <attributeId> <start> <end>')
+        print('Usage: experiment_select <csvFile> <attributeId> <start> <end>')
         sys.exit(1)
-    pageFile = sys.argv[1]
+    csvFile = sys.argv[1]
     attributeId = sys.argv[2]
     start = sys.argv[3]
     end = sys.argv[4]
     
     pageSizes = [
-        1 * 2 ** 10,
+        1 * 2 ** 10,   # 1 KB
         2 * 2 ** 10,   # 2 KB
         4 * 2 ** 10,   # 4 KB
         8 * 2 ** 10,   # 8 KB
-        16 * 2 ** 10,  
-        32 * 2 ** 10,
-        64 * 2 ** 10,
+        16 * 2 ** 10,   # 16 KB
+        32 * 2 ** 10,   # 32 KB
+        64 * 2 ** 10,   # 64 KB
+        128 * 2 ** 10,   # 64 KB
     ]
     sizeList = []    
     timeTookList = []
@@ -54,6 +55,16 @@ def main():
     csvwriter = csv.DictWriter(sys.stdout, fieldnames=('page_size','time_took'))
     csvwriter.writeheader()
     for size in pageSizes:
+        pageFile = 'heapfile' + str(size)
+        subprocess.run(
+        [
+            os.path.join(os.path.dirname(os.path.realpath(__file__)), './csv2heapfile'),
+            csvFile,
+            pageFile,
+            str(size),
+        ],
+        stdout=subprocess.PIPE,
+        )
         aveRate = 0
         timeAve = 0
         timeTookList[:] = []
@@ -85,7 +96,7 @@ def main():
     plt.yscale('log', basey=2)
 
     plt.ylim(0,max(timeAveList)+1000)
-    plt.title('Select A-F ',fontweight='bold')
+    plt.title('Select A-B ',fontweight='bold')
     plt.show()
 
 if __name__ == '__main__':
