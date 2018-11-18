@@ -13,7 +13,7 @@ def csv2heapfile(csvFile, outputFile, pageSize):
     """
     result = subprocess.run(
         [
-            os.path.join(os.path.dirname(os.path.realpath(__file__)), './write_fixed_len_pages'),
+            os.path.join(os.path.dirname(os.path.realpath(__file__)), './csv2heapfile'),
             csvFile,
             outputFile,
             str(pageSize),
@@ -86,6 +86,7 @@ def main():
     plt.ylabel("csv2heapfile Data Rates (records/s)")
     plt.xscale('log', basex=2)
 
+    plt.ylim(0, 100000)
     plt.ylim(0, max(aveRateList)+5000)
     plt.title('Build Heapfile from csv ::: ',fontweight='bold')
     plt.show()
