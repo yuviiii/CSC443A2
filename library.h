@@ -97,10 +97,14 @@ void read_page(Heapfile *heapfile, PageID pid, Page *page);
 void write_page(Page *page, Heapfile *heapfile, PageID pid);
 
 class RecordIterator {
+        Heapfile *heapfile;
+        RecordID *rid;
+        Page *curPage;
+    
     public:
-        RecordIterator(Heapfile *heapfile);
-        Record next();
-        bool hasNext();
+    RecordIterator(Heapfile *heapfile); 
+    Record  next();
+    bool hasNext();
 };
 
 #endif

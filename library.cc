@@ -200,3 +200,44 @@ void write_page(Page *page, Heapfile *heapfile, PageID pid){
 	fwrite(&freespace, sizeof(int), 1, heapfile->file_ptr);
 	// fflush(heapfile->file_ptr);
 }
+
+RecordIterator::RecordIterator(Heapfile *heapfile){
+	this->heapfile =  (Heapfile*) malloc(sizeof(Heapfile));
+	this->heapfile = heapfile;
+	this->rid = (RecordID*) malloc(sizeof(RecordID));	
+	this->rid->page_id=0;
+    this->rid->slot=0;
+	this->curPage = (Page *)malloc(heapfile->page_size);
+    read_page(heapfile, 0, this->curPage);
+	}
+	
+Record  RecordIterator::next(){
+        Record record;
+        if (this->rid->slot<fixed_len_page_capacity(this->curPage)){
+                read_fixed_len_page(this->curPage, this->rid->slot, &record);
+                this->rid->slot +=1 ;
+                return record;
+        }
+        else{
+                rid->slot=0;
+                this->rid->page_id += 1;
+                read_page(this->heapfile, this->rid->page_id, this->curPage);
+                return next();
+        }
+}
+bool RecordIterator::hasNext(){
+        Record record;
+        if (this->rid->slot<fixed_len_page_capacity(this->curPage)){
+         		read_fixed_len_page(this->curPage, this->rid->slot, &record);
+                if (record.empty()) return false;
+        }
+        else{
+        	int id = this->rid->page_id + 1;
+        	Page * page = (Page *)malloc(this->heapfile->page_size);
+        	read_page(this->heapfile,id,page);
+        	read_fixed_len_page(page, this->rid->slot, &record);
+        	free(page);
+        	if (record.empty()) return false;
+        }
+        return true;
+}
